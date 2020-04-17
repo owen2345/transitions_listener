@@ -1,4 +1,4 @@
-name: Rspec CI
+name: Ruby Gem
 
 on:
   push:
@@ -6,27 +6,24 @@ on:
       - master
   pull_request:
 
+
 jobs:
   build:
+    name: Tests and Code Style
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Install Ruby version specified in `.ruby-version`
-        uses: eregon/use-ruby-action@master # this will use by default the .ruby-version file in your repository
-      - name: Install required apt packages
-        run: |
-          sudo apt-get -y install libpq-dev
-      - name: Setup cache key and directory for gems cache
-        uses: actions/cache@v1
+      - uses: actions/checkout@v2
+      - name: Set up Ruby 2.6
+        uses: actions/setup-ruby@v1
         with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gem-use-ruby-${{ hashFiles('**/Gemfile.lock') }}
+          ruby-version: 2.6.x
+
       - name: Bundle install
         run: |
-          bundle config path vendor/bundle
+          gem install bundler
           bundle install --jobs 4 --retry 3
-      - name: Rails tests (rspec)
+      - name: Tests (rspec)
         run: |
           bundle exec rspec
       - name: Code style (Rubocop)
