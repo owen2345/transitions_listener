@@ -44,6 +44,14 @@ RSpec.describe TransitionsListener::Listener do
         expect(trans.any?).to be_truthy
       end
 
+      it 'filter multiple states' do
+        inst.before_transition(active: :inactive, inactive: :deleted) {}
+        trans = inst.filter_transitions(:before, from: :active, to: :inactive)
+        expect(trans.any?).to be_truthy
+        trans = inst.filter_transitions(:before, from: :inactive, to: :deleted)
+        expect(trans.any?).to be_truthy
+      end
+
       it 'filter many to many states' do
         inst.before_transition(%i[active inactive] => %i[deleted restored]) {}
         trans = inst.filter_transitions(:before, from: :active, to: :deleted)

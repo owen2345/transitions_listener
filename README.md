@@ -29,8 +29,8 @@ class Article < ActiveRecord::Base
     after_transition active: :inactive do |article, transition|
       # article.send_inactive_email
     end
-    after_transition any => :deleted do |article, transition|
-      # article.send_destroyed_email
+    before_transition any => :deleted do |article, transition|
+      # article.errors.add(:base, "not possible") if article.active_carts.any?
     end
   end
 end
@@ -46,6 +46,7 @@ States can be defined as the following:
 - ```before_transition(any => :active)``` block will be called when attr value is changed from any value to :active
 - ```before_transition(:active => any)``` block will be called when attr value is changed from :active value to any value
 - ```before_transition(%i[active inactive] => %i[deleted cancelled])``` block will be called when attr value is changed from :active or inactive to :deleted or :cancelled
+- ```before_transition(active: :inactive, inactive: :deleted)``` block will be called when attr value is changed from :active to :inactive or :inactive to :deleted
 
 ## Development
 
