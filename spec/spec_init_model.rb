@@ -39,7 +39,7 @@ class Article < ActiveRecord::Base
   end
 
   def any_to_any_callback(_transition)
-    puts "any to any callback called"
+    puts 'any to any callback called'
   end
 
   # state: active, inactive, deleted
