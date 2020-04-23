@@ -8,12 +8,12 @@ module TransitionsListener
       instance_eval(&block)
     end
 
-    def before_transition(states, &block)
-      before_transitions(states: states, block: block)
+    def before_transition(states, callback_method = nil, &block)
+      before_transitions(states: states, block: callback_method || block)
     end
 
-    def after_transition(states, &block)
-      after_transitions(states: states, block: block)
+    def after_transition(states, callback_method = nil, &block)
+      after_transitions(states: states, block: callback_method || block)
     end
 
     def filter_transitions(kind, from:, to:)

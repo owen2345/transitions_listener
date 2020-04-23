@@ -34,6 +34,12 @@ class Article < ActiveRecord::Base
     after_transition any => any do |article, transition|
       article.log_after(transition)
     end
+
+    before_transition({ any => any }, :any_to_any_callback)
+  end
+
+  def any_to_any_callback(_transition)
+    puts "any to any callback called"
   end
 
   # state: active, inactive, deleted

@@ -19,6 +19,12 @@ RSpec.describe Article, type: :model do
       expect(article).to receive(:log_before).with(expected_trans)
       article.update(state: new_state)
     end
+
+    it 'use model method as the listener callback' do
+      expected_trans = hash_including(:from, :to)
+      expect(article).to receive(:any_to_any_callback).with(expected_trans)
+      article.update(state: 'inactive')
+    end
   end
 
   describe 'after transitions' do

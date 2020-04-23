@@ -32,6 +32,12 @@ class Article < ActiveRecord::Base
     before_transition any => :deleted do |article, transition|
       # article.errors.add(:base, "not possible") if article.active_carts.any?
     end
+    
+    before_transition({ any => any }, :any_to_any_callback)
+  end
+  
+  def any_to_any_callback(_transition)
+    puts "any to any callback called"
   end
 end
 ```
@@ -40,13 +46,15 @@ end
 - ````listen_transitions(attr_name){block}```` permit to define state transitions listener for a specific model attribute
 - ````before_transition(states){block}```` permit to listen transitions before the new state is saved (Before update)
 - ````after_transition(states){block}```` permit to listen transitions after the new state was saved (After update)
+- ````before_transition(states, :callback_name)```` model method to listen transition callbacks
+- ````after_transition(states, :callback_name)```` model method to listen transition callbacks
 
 States can be defined as the following:
-- ```before_transition(any => any)``` block will be called when attr value is changed from any value to any value
-- ```before_transition(any => :active)``` block will be called when attr value is changed from any value to :active
-- ```before_transition(:active => any)``` block will be called when attr value is changed from :active value to any value
-- ```before_transition(%i[active inactive] => %i[deleted cancelled])``` block will be called when attr value is changed from :active or inactive to :deleted or :cancelled
-- ```before_transition(active: :inactive, inactive: :deleted)``` block will be called when attr value is changed from :active to :inactive or :inactive to :deleted
+- ```before_transition(any => any){}``` block will be called when attr value is changed from any value to any value
+- ```before_transition(any => :active){}``` block will be called when attr value is changed from any value to :active
+- ```before_transition(:active => any){}``` block will be called when attr value is changed from :active value to any value
+- ```before_transition(%i[active inactive] => %i[deleted cancelled]){}``` block will be called when attr value is changed from :active or inactive to :deleted or :cancelled
+- ```before_transition(active: :inactive, inactive: :deleted){}``` block will be called when attr value is changed from :active to :inactive or :inactive to :deleted
 
 ## Development
 
