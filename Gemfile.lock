@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    transitions_listener (0.2.0)
+    transitions_listener (0.2.1)
       activerecord
       activesupport
 
