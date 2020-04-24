@@ -21,8 +21,7 @@ RSpec.describe Article, type: :model do
     end
 
     it 'use model method as the listener callback' do
-      expected_trans = hash_including(:from, :to)
-      expect(article).to receive(:any_to_any_callback).with(expected_trans)
+      expect(article).to receive(:any_to_any_callback)
       article.update(state: 'inactive')
     end
   end

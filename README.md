@@ -36,7 +36,7 @@ class Article < ActiveRecord::Base
     before_transition({ any => any }, :any_to_any_callback)
   end
   
-  def any_to_any_callback(_transition)
+  def any_to_any_callback
     puts "any to any callback called"
   end
 end
