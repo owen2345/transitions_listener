@@ -26,35 +26,54 @@ And then execute: ```bundle install```
 class Article < ActiveRecord::Base
   include TransitionsListener
   listen_transitions :state do
-    after_transition active: :inactive do |article, transition|
+    after_transition from: :active, to: :inactive do |article, transition|
       # article.send_inactive_email
     end
-    before_transition any => :deleted do |article, transition|
+    before_transition from: any, to: :deleted do |article, transition|
       # article.errors.add(:base, "not possible") if article.active_carts.any?
     end
     
-    before_transition({ any => any }, :any_to_any_callback)
+    before_transition({ from: any, to: any }, if: :valid_article?, unless: :destroyed?, callback: :any_to_any_callback)
   end
   
   def any_to_any_callback
     puts "any to any callback called"
   end
+  
+  def valid_article?
+    true
+  end
+  
+  def destroyed?
+    false
+  end
 end
 ```
 
 ## API
-- ````listen_transitions(attr_name){block}```` permit to define state transitions listener for a specific model attribute
-- ````before_transition(states){block}```` permit to listen transitions before the new state is saved (Before update)
-- ````after_transition(states){block}```` permit to listen transitions after the new state was saved (After update)
-- ````before_transition(states, :callback_name)```` model method to listen transition callbacks
-- ````after_transition(states, :callback_name)```` model method to listen transition callbacks
+- ````listen_transitions(attr_name){block}````   
+    permit to define state transitions listener for a specific model attribute
+
+-   Before update   
+    ````before_transition(states, if: :action?, unless: :action?, callback: :action) { block }````   
+    Permit to listen transitions before the new state is saved
+    * states: (Mandatory) State Transition(s) to listen for
+    * if: (Optional) Positive conditional action(s) to execute callback. Sample: ```if: :deleted? | if: [:deleted?, :ready?]```  
+    * unless: (Optional) Negative conditional action(s) to execute callback. Sample: ```unless: :deleted? | unless: [:deleted?, :ready?]```
+    * callback: (Optional) Model method to be called as a callback (Will be overridden If block is defined)
+
+-   After update (Args are similar to before update)   
+    ````after_transition(states, if: :action?, unless: :action?, callback: :action){ block }````   
+    permit to listen transitions after the new state was saved
+
 
 States can be defined as the following:
-- ```before_transition(any => any){}``` block will be called when attr value is changed from any value to any value
-- ```before_transition(any => :active){}``` block will be called when attr value is changed from any value to :active
-- ```before_transition(:active => any){}``` block will be called when attr value is changed from :active value to any value
-- ```before_transition(%i[active inactive] => %i[deleted cancelled]){}``` block will be called when attr value is changed from :active or inactive to :deleted or :cancelled
-- ```before_transition(active: :inactive, inactive: :deleted){}``` block will be called when attr value is changed from :active to :inactive or :inactive to :deleted
+- ```before_transition(from: any, to: any){}``` block will be called when attr value is changed from any value to any value
+- ```before_transition(from: any, to: :active){}``` block will be called when attr value is changed from any value to :active
+- ```before_transition(from: :active, to: any){}``` block will be called when attr value is changed from :active value to any value
+- ```before_transition(from: %i[active inactive], to: %i[deleted cancelled]){}``` block will be called when attr value is changed from :active or inactive to :deleted or :cancelled
+- ```before_transition([{ from: :active, to: :inactive }, { from: :inactive: :deleted }]){}``` block will be called when attr value is changed from :active to :inactive or :inactive to :deleted
+- ```before_transition([{ active: :inactive, inactive: :deleted }]){}``` block will be called when attr value is changed from :active to :inactive or :inactive to :deleted (Shorter state definitions. Same as above)
 
 ## Development
 

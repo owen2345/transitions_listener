@@ -27,15 +27,15 @@ prepare_database!
 class Article < ActiveRecord::Base
   include TransitionsListener
   listen_transitions :state do
-    before_transition any => any do |article, transition|
+    before_transition from: any, to: any do |article, transition|
       article.log_before(transition)
     end
 
-    after_transition any => any do |article, transition|
+    after_transition from: any, to: any do |article, transition|
       article.log_after(transition)
     end
 
-    before_transition({ any => any }, :any_to_any_callback)
+    before_transition({ from: any, to: any }, callback: :any_to_any_callback)
   end
 
   def any_to_any_callback

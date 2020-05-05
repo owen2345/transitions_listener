@@ -24,13 +24,11 @@ module TransitionsListener
 
     def perform_transition_listeners(model, kind = :before)
       transition_listeners.each do |listener|
-        c_transition = current_transition_for(model, listener.attr)
-        listener.filter_transitions(kind, c_transition).each do |transition|
-          if transition[:block].is_a?(Proc)
-            transition[:block].call(model, c_transition.merge(transition))
-          else # method name
-            model.public_send(transition[:block])
-          end
+        c_trans = current_transition_for(model, listener.attr)
+        listener.filter_transitions(kind, model, c_trans).each do |trans|
+          block = trans[:args][:callback]
+          args = c_trans.dup.merge(trans)
+          block.is_a?(Proc) ? block.call(model, args) : model.public_send(block)
         end
       end
     end
